@@ -1,0 +1,9 @@
+requests
+numpy
+torch
+transformers
+sentencepiece
+fastapi
+uvicorn
+python-dotenv
+huggingface_hub
