@@ -1,3 +1,5 @@
+import asyncio
+
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
@@ -32,7 +34,7 @@ def home():
 async def rank_videos(request: QueryRequest):
 
     try:
-        results = rank_videos_hybrid(request.query)
+        results = await asyncio.to_thread(rank_videos_hybrid, request.query)
 
         return {
             "success": True,

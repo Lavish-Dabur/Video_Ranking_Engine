@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from cache import get_cache, set_cache
 
 load_dotenv()
 
@@ -248,6 +249,14 @@ def process_video(v, metadata_ratios):
 
 def rank_videos_hybrid(query):
 
+    query = query.lower().strip()
+
+    cached = get_cache(query)
+    if cached:
+        print("Cache hit 🚀")
+        return cached
+    
+
     videos = search_videos(query, max_results=5)
 
     if len(videos) == 0:
@@ -302,26 +311,6 @@ def rank_videos_hybrid(query):
 
     ranked = sorted(results, key=lambda x: x["score"], reverse=True)
 
+    set_cache(query, ranked)
+
     return ranked
-
-
-
-if __name__ == "__main__":
-
-    print("Testing YouTube Ranking Engine...\n")
-
-    query = "data structures tutorial"
-
-    results = rank_videos_hybrid(query)
-
-    print("\nRanked Results:\n")
-
-    for i, r in enumerate(results):
-
-        print(f"{i+1}. {r['title']}")
-        print("Video ID:", r["video_id"])
-        print("Score:", round(r["score"],3))
-        print("Sentiment:", round(r["sentiment"],3))
-        print("Engagement:", round(r["engagement"],3))
-        print("Like Ratio:", round(r["like_ratio"],6))
-        print("-"*60)
