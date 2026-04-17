@@ -12,6 +12,7 @@ load_dotenv()
 
 API_KEY = os.environ.get("API_KEY")
 MODEL_PATH = "lavishdabur/youtube-sentiment-model"
+UPDATED_MODEL_PATH = "lavishdabur/updated_ranking_model"
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -22,8 +23,8 @@ model = None
 def load_model():
     global tokenizer, model
     if model is None:
-        tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH, cache_dir="./model_cache")
-        model = AutoModelForSequenceClassification.from_pretrained(MODEL_PATH, cache_dir="./model_cache")
+        tokenizer = AutoTokenizer.from_pretrained(UPDATED_MODEL_PATH, cache_dir="./model_cache")
+        model = AutoModelForSequenceClassification.from_pretrained(UPDATED_MODEL_PATH, cache_dir="./model_cache")
         model.to(device)
         model.eval()
 
@@ -45,7 +46,7 @@ def predict_sentiment(comments):
         comments,
         padding=True,
         truncation=True,
-        max_length=128,   # reduced for speed
+        max_length=128,   
         return_tensors="pt"
     ).to(device)
 
@@ -53,7 +54,7 @@ def predict_sentiment(comments):
         outputs = model(**inputs)
 
     probs = F.softmax(outputs.logits, dim=1)
-    return probs[:, 1].cpu().numpy()   # probability of positive
+    return probs[:, 1].cpu().numpy()   
 
 
 def search_videos(query, max_results=5):
@@ -168,7 +169,7 @@ def compute_engagement_score(comment_data):
 def process_video(v, metadata_ratios):
     video_id = v["video_id"]
 
-    # Skip poor-quality videos early
+    
     if metadata_ratios.get(video_id, 0) < 0.001:
         return None
 
