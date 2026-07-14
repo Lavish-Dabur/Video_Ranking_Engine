@@ -5,7 +5,7 @@ import time
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from ranking_engine import load_model, rank_videos_hybrid
+from ranking_engine import rank_videos_hybrid
 
 logger = logging.getLogger(__name__)
 
@@ -22,14 +22,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.on_event("startup")
-async def warm_ranking_model():
-    """Load the sentiment model before accepting search requests."""
-    started_at = time.perf_counter()
-    await asyncio.to_thread(load_model)
-    logger.info("Ranking model loaded in %.2fs", time.perf_counter() - started_at)
 
 
 class QueryRequest(BaseModel):

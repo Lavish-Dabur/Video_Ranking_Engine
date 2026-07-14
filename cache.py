@@ -6,6 +6,9 @@ CACHE_TTL = 300  # 5 minutes
 logger = logging.getLogger(__name__)
 
 def get_cache(query):
+    if redis_client is None:
+        return None
+
     try:
         data = redis_client.get(query)
         if data:
@@ -15,6 +18,9 @@ def get_cache(query):
         return None
 
 def set_cache(query, results):
+    if redis_client is None:
+        return
+
     try:
         redis_client.setex(
             query,

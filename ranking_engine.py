@@ -27,8 +27,6 @@ def load_model():
     if model is not None:
         return
 
-    # The first ranking request processes several videos concurrently.  Only
-    # one worker may download/initialise the model; the others wait for it.
     with model_load_lock:
         if model is None:
             tokenizer = AutoTokenizer.from_pretrained(UPDATED_MODEL_PATH, cache_dir="./model_cache")
