@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from threading import Lock
 import torch.nn.functional as F
 from cache import get_cache, set_cache
 
@@ -19,14 +20,21 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 tokenizer = None
 model = None
+model_load_lock = Lock()
 
 def load_model():
     global tokenizer, model
-    if model is None:
-        tokenizer = AutoTokenizer.from_pretrained(UPDATED_MODEL_PATH, cache_dir="./model_cache")
-        model = AutoModelForSequenceClassification.from_pretrained(UPDATED_MODEL_PATH, cache_dir="./model_cache")
-        model.to(device)
-        model.eval()
+    if model is not None:
+        return
+
+    # The first ranking request processes several videos concurrently.  Only
+    # one worker may download/initialise the model; the others wait for it.
+    with model_load_lock:
+        if model is None:
+            tokenizer = AutoTokenizer.from_pretrained(UPDATED_MODEL_PATH, cache_dir="./model_cache")
+            model = AutoModelForSequenceClassification.from_pretrained(UPDATED_MODEL_PATH, cache_dir="./model_cache")
+            model.to(device)
+            model.eval()
 
 
 def normalize(values):

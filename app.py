@@ -1,9 +1,13 @@
 import asyncio
+import logging
+import time
 
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from ranking_engine import rank_videos_hybrid
+from ranking_engine import load_model, rank_videos_hybrid
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="YouTube Ranking API",
@@ -20,6 +24,14 @@ app.add_middleware(
 )
 
 
+@app.on_event("startup")
+async def warm_ranking_model():
+    """Load the sentiment model before accepting search requests."""
+    started_at = time.perf_counter()
+    await asyncio.to_thread(load_model)
+    logger.info("Ranking model loaded in %.2fs", time.perf_counter() - started_at)
+
+
 class QueryRequest(BaseModel):
     query: str
 
@@ -34,7 +46,14 @@ def home():
 async def rank_videos(request: QueryRequest):
 
     try:
+        started_at = time.perf_counter()
         results = await asyncio.to_thread(rank_videos_hybrid, request.query)
+        logger.info(
+            "Rank request completed in %.2fs (query=%r, results=%d)",
+            time.perf_counter() - started_at,
+            request.query,
+            len(results),
+        )
 
         return {
             "success": True,
@@ -44,6 +63,7 @@ async def rank_videos(request: QueryRequest):
         }
 
     except Exception as e:
+        logger.exception("Rank request failed (query=%r)", request.query)
         return {
             "success": False,
             "error": str(e)
