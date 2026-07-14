@@ -1,0 +1,23 @@
+# Local environments and generated files
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+model_cache/
+
+# Source-control and editor files
+.git/
+.vscode/
+
+# Secrets must be supplied to the container at runtime, never copied in.
+.env
+
+# The frontend has its own build and is not served by this FastAPI image.
+frontend/
+
+# Development-only assets
+sentiment-training.ipynb
+test.py
+t2.py
+model-upload.py
+data/
