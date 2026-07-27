@@ -56,6 +56,8 @@ def predict_sentiment(comments):
         return_tensors="pt"
     ).to(device)
 
+    inputs.pop("token_type_ids", None)
+
     with torch.no_grad():
         outputs = model(**inputs)
 
@@ -85,10 +87,11 @@ def search_videos(query, max_results=5):
 
     return [
         {
-            "video_id": item["id"]["videoId"],
-            "title": item["snippet"]["title"]
+            "video_id": item.get("id", {}).get("videoId"),
+            "title": item.get("snippet", {}).get("title", "")
         }
         for item in data.get("items", [])
+        if item.get("id", {}).get("videoId")
     ]
 
 
@@ -174,10 +177,6 @@ def compute_engagement_score(comment_data):
 
 def process_video(v, metadata_ratios):
     video_id = v["video_id"]
-
-    
-    if metadata_ratios.get(video_id, 0) < 0.001:
-        return None
 
     try:
         comment_data = get_comments_with_stats(video_id)
@@ -274,3 +273,4 @@ def rank_videos_hybrid(query):
     set_cache(query, ranked)
 
     return ranked
+

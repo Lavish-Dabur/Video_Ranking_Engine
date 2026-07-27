@@ -30,7 +30,7 @@ class QueryRequest(BaseModel):
 
 @app.get("/")
 def home():
-    return {"status": "API is running 🚀"}
+    return {"status": "API is running "}
 
 
 
