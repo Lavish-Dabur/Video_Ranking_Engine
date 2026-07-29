@@ -1,7 +1,8 @@
 import os
-from ranking_engine import MODEL_PATH
 
 from transformers import AutoModelForSequenceClassification
+
+from ranking_engine import MODEL_PATH
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 

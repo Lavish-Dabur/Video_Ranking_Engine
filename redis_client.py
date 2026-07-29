@@ -1,7 +1,8 @@
-import redis
 import os
-import requests
 from urllib.parse import urlparse
+
+import redis
+import requests
 
 REDIS_URL = os.getenv("REDIS_URL") or os.getenv("REDIS-URL")
 REDIS_TOKEN = os.getenv("REDIS_TOKEN")

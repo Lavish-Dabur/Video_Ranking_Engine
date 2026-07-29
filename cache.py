@@ -1,5 +1,6 @@
 import json
 import logging
+
 from redis_client import redis_client
 
 CACHE_TTL = 300  # 5 minutes

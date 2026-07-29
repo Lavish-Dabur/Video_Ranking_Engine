@@ -1,12 +1,14 @@
-import requests
-import numpy as np
-import torch
 import os
-from dotenv import load_dotenv
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from threading import Lock
+
+import numpy as np
+import requests
+import torch
 import torch.nn.functional as F
+from dotenv import load_dotenv
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
+
 from cache import get_cache, set_cache
 
 load_dotenv()
