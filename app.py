@@ -3,8 +3,9 @@ import logging
 import time
 
 from fastapi import FastAPI
-from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
 from ranking_engine import rank_videos_hybrid
 
 logger = logging.getLogger(__name__)
