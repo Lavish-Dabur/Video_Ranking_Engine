@@ -32,3 +32,10 @@ jobs:
 
       - name: Check Python Syntax
         run: python -m compileall .
+
+      - name: Run Ruff
+        run: |
+          pip install ruff
+          ruff check .
+      - name: Build Docker Image
+        run: docker build -t youtube-ranking-backend .
